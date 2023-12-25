@@ -1,71 +1,58 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package com.cis.base.config.core.boot.db;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.beans.factory.annotation.Value;
+import com.cis.base.config.core.boot.JdbcDriverConfig;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
 
 /**
- * @author YSivlay
+ * Configuration for a DataSource.
+ * @see DataSourceProperties about how to configure this DS
  */
 @Configuration
 public class DataSourceConfig {
+    private static final Logger logger = LoggerFactory.getLogger(DataSourceConfig.class);
 
-    @Value("${spring.datasource.url}")
-    private String jdbcUrl;
-
-    @Value("${spring.datasource.username}")
-    private String username;
-
-    @Value("${spring.datasource.password}")
-    private String password;
-
-    @Value("${spring.datasource.driver-class-name}")
-    private String driverClassName;
-
-    @Value("${spring.datasource.hikari.connection-timeout:30000}")
-    private long connectionTimeout;
-
-    @Value("${spring.datasource.hikari.maximum-pool-size:10}")
-    private int maximumPoolSize;
-
-    @Value("${spring.datasource.hikari.minimum-idle:5}")
-    private int minimumIdle;
-
-    @Value("${spring.datasource.hikari.idle-timeout:600000}")
-    private long idleTimeout;
-
-    @Value("${spring.datasource.hikari.pool-name:SpringBootHikariCP}")
-    private String poolName;
-
-    @Value("${spring.datasource.hikari.connection-test-query:SELECT 1}")
-    private String connectionTestQuery;
-
-    @Value("${spring.datasource.hikari.leak-detection-threshold:30000}")
-    private long leakDetectionThreshold;
+    @Autowired
+    JdbcDriverConfig config;
 
     @Bean
-    @Primary
-    public DataSource dataSource() {
-
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
-        hikariConfig.setDriverClassName(driverClassName);
-        hikariConfig.setConnectionTimeout(connectionTimeout);
-        hikariConfig.setMaximumPoolSize(maximumPoolSize);
-        hikariConfig.setMinimumIdle(minimumIdle);
-        hikariConfig.setIdleTimeout(idleTimeout);
-        hikariConfig.setPoolName(poolName);
-        hikariConfig.setConnectionTestQuery(connectionTestQuery);
-        hikariConfig.setLeakDetectionThreshold(leakDetectionThreshold);
-
-        return new HikariDataSource(hikariConfig);
+    public DataSourceProperties dataSourceProperties() {
+        return new DataSourceProperties(config.getDriverClassName(), config.getProtocol(), config.getSubProtocol(), config.getPort());
     }
 
+    @Bean
+    public DataSource tenantDataSourceJndi() {
+        PoolConfiguration p = getProperties();
+        org.apache.tomcat.jdbc.pool.DataSource ds = new org.apache.tomcat.jdbc.pool.DataSource(p);
+        logger.info("Created new datasource; url=" + p.getUrl());
+        return ds;
+    }
+
+    protected DataSourceProperties getProperties() {
+        return dataSourceProperties();
+    }
 }
