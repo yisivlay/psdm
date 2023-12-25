@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
  * @author YSivlay
  */
 @Configuration
+@Import({WebFrontEndConfig.class})
 @ImportResource({"classpath:META-INF/spring/applicationContext.xml"})
 @PropertySource(value = "classpath:META-INF/spring/jdbc.properties")
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,
