@@ -26,45 +26,45 @@ import org.springframework.util.StringUtils;
 /**
  * Configurable DataSource. Properties have sensible defaults, but end-users can
  * override those via the Spring Values listed below; i.e. via -D Java System
- * properties, or main() command line arguments, OS environment variables, from
+ * properties, or main() json line arguments, OS environment variables, from
  * JNDI, or application.properties (thanks Spring Boot). For example:
  * -Dcis.datasource.port=3307.
  */
 public class DataSourceProperties extends PoolProperties {
 
-    @Value("${cis.datasource.port:3306}")
+    @Value("${cis.datasource.port}")
     private volatile @NotNull
     int port;
 
-    @Value("${cis.datasource.host:localhost}")
+    @Value("${cis.datasource.host}")
     private volatile @NotNull
     String hostname;
 
-    @Value("${cis.datasource.db:psdm-tenant}")
+    @Value("${cis.datasource.db}")
     private volatile @NotNull
     String dbName;
 
-    @Value("${cis.datasource.username:cisroot}")
+    @Value("${cis.datasource.username}")
     private volatile @NotNull
     String username;
 
-    @Value("${cis.datasource.password:cis@2020!}")
+    @Value("${cis.datasource.password}")
     private volatile @NotNull
     String password;
 
-    @Value("${cis.datasource.protocol:jdbc}")
+    @Value("${cis.datasource.protocol}")
     private volatile @NotNull
     String jdbcProtocol;
 
-    @Value("${cis.datasource.subprotocol:mysql}")
+    @Value("${cis.datasource.sub_protocol}")
     private volatile @NotNull
-    String jdbcSubprotocol;
+    String jdbcSubProtocol;
 
     public DataSourceProperties(String driverClassName, String protocol, String subProtocol, Integer port) {
         super();
         setDriverClassName(driverClassName);
         this.jdbcProtocol = protocol;
-        this.jdbcSubprotocol = subProtocol;
+        this.jdbcSubProtocol = subProtocol;
         this.port = port;
         setDefaults();
     }
@@ -90,7 +90,7 @@ public class DataSourceProperties extends PoolProperties {
         if (StringUtils.hasText(url)) {
             throw new IllegalStateException();
         }
-        return jdbcProtocol + ":" + jdbcSubprotocol + "://" + getHost() + ":" + getPort() + "/" + getDBName();
+        return jdbcProtocol + ":" + jdbcSubProtocol + "://" + getHost() + ":" + getPort() + "/" + getDBName();
     }
 
     @Override

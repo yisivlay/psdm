@@ -29,10 +29,6 @@ import java.util.Objects;
 @Service
 public class JdbcDriverConfig {
 
-    private final static String DRIVER_CLASS_PROPERTY_NAME = "DRIVER_CLASS_NAME";
-    private final static String PROTOCOL_PROPERTY_NAME = "PROTOCOL";
-    private final static String SUB_PROTOCOL_PROPERTY_NAME = "SUB_PROTOCOL";
-    private final static String PORT_PROPERTY_NAME = "PORT";
     @Autowired
     ApplicationContext context;
     private String driverClassName;
@@ -43,10 +39,10 @@ public class JdbcDriverConfig {
     @PostConstruct
     protected void init() {
         Environment environment = context.getEnvironment();
-        driverClassName = environment.getProperty(DRIVER_CLASS_PROPERTY_NAME);
-        protocol = environment.getProperty(PROTOCOL_PROPERTY_NAME);
-        subProtocol = environment.getProperty(SUB_PROTOCOL_PROPERTY_NAME);
-        port = Integer.parseInt(Objects.requireNonNull(environment.getProperty(PORT_PROPERTY_NAME)));
+        driverClassName = environment.getProperty("cis.datasource.driver-class-name");
+        protocol = environment.getProperty("cis.datasource.protocol");
+        subProtocol = environment.getProperty("cis.datasource.sub_protocol");
+        port = Integer.valueOf(Objects.requireNonNull(environment.getProperty("cis.datasource.port")));
     }
 
     public String getDriverClassName() {

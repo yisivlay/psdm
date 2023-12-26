@@ -52,7 +52,7 @@ public class TomcatConfig {
             URL url = resource.getURL();
             File targetFile = new File(Objects.requireNonNull(resource.getFilename()));
             long len = resource.contentLength();
-            if (!targetFile.exists() || targetFile.length() != len) { // Only
+            if (!targetFile.exists() || targetFile.length() != len) {
                 FileUtils.copyURLToFile(url, targetFile);
             }
             return targetFile;
