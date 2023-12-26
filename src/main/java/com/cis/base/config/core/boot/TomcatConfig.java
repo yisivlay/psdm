@@ -1,64 +1,30 @@
 package com.cis.base.config.core.boot;
 
-import org.apache.catalina.connector.Connector;
-import org.apache.commons.io.FileUtils;
-import org.apache.coyote.http11.Http11NioProtocol;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Objects;
 
 /**
  * @author YSivlay
  */
 @Configuration
-public class TomcatConfig {
+public class TomcatConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
-    @Bean
-    public TomcatServletWebServerFactory servletContainer() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.setContextPath("/psdm-provider");
-        tomcat.addAdditionalTomcatConnectors(createHttpConnector());
-        return tomcat;
-    }
-
-    private Connector createHttpConnector() {
-        Connector connector = new Connector(Http11NioProtocol.class.getName());
-        try {
-            File file = getFile(new ClassPathResource("/keystore.jks"));
-            connector.setScheme("http");
-            connector.setSecure(true);
-            connector.setPort(8443);
-        } catch (IOException ex) {
-            throw new IllegalStateException("can't access keystore: [" + "keystore" + "] or truststore: [" + "keystore" + "]", ex);
-        }
-
-        return connector;
-    }
-
-    public File getFile(Resource resource) throws IOException {
-        try {
-            return resource.getFile();
-        } catch (IOException e) {
-        }
-
-        try {
-            URL url = resource.getURL();
-            File targetFile = new File(Objects.requireNonNull(resource.getFilename()));
-            long len = resource.contentLength();
-            if (!targetFile.exists() || targetFile.length() != len) {
-                FileUtils.copyURLToFile(url, targetFile);
-            }
-            return targetFile;
-        } catch (IOException e) {
-            throw new IOException("Can not obtain a file for resource: " + resource, e);
-        }
-
+    @Override
+    public void customize(TomcatServletWebServerFactory factory) {
+        factory.setContextPath("/psdm-provider");
+        factory.addConnectorCustomizers(
+                connector -> {
+                    connector.setSecure(true);
+                    connector.setScheme("https");
+                    connector.setPort(8443);
+                    connector.setProperty("keyAlias", "tomcat");
+                    connector.setProperty("keystorePass", "caminfoservices");
+                    connector.setProperty("keystoreFile", "/keystore.jks");
+                    connector.setProperty("keyPass", "caminfoservices");
+                    connector.setProperty("clientAuth", "false");
+                    connector.setProperty("sslProtocol", "TLS");
+                    connector.setProperty("sslEnabledProtocols", "TLSv1.2,TLSv1.3");
+                });
     }
 }
