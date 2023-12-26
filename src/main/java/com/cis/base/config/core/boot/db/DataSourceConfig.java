@@ -58,7 +58,7 @@ public class DataSourceConfig {
     public DataSource tenantDataSourceJndi() {
         PoolConfiguration p = getProperties();
         org.apache.tomcat.jdbc.pool.DataSource ds = new org.apache.tomcat.jdbc.pool.DataSource(p);
-        logger.info("Created new datasource; url=" + p.getUrl());
+        logger.info("Created new datasource: " + p.getUrl());
         return ds;
     }
 
@@ -68,6 +68,7 @@ public class DataSourceConfig {
         em.setDataSource(tenantDataSourceJndi());
         em.setPackagesToScan("com.cis.base.**.domain");
         em.setJpaVendorAdapter(jpaVendorAdapter());
+        logger.info("Entity manager factory connect with datasource: " + em.getDataSource());
         return em;
     }
 
@@ -76,6 +77,7 @@ public class DataSourceConfig {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true);
         vendorAdapter.setShowSql(true);
+        logger.info("JpaVendorAdapter on persistence provider root package: " + vendorAdapter.getPersistenceProviderRootPackage());
         return vendorAdapter;
     }
 
@@ -84,6 +86,7 @@ public class DataSourceConfig {
     public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(emf);
+        logger.info("JpaTransactionManager on resource factory: " + transactionManager.getResourceFactory());
         return transactionManager;
     }
 
@@ -98,6 +101,7 @@ public class DataSourceConfig {
                     properties.setProperty("hibernate.order_inserts", "true");
                     properties.setProperty("hibernate.order_updates", "true");
                     emfBean.setJpaProperties(properties);
+                    logger.info("BeanPostProcessor on bean class loader: " + emfBean.getBeanClassLoader());
                 }
                 return bean;
             }
